@@ -10,6 +10,9 @@ namespace CommandClient
 {
     public class Worker : BackgroundService
     {
+        // TODO: Optimistic concurrency
+        // https://developers.eventstore.com/clients/grpc/appending-events/#handling-concurrency
+
         private readonly EventStoreClient _eventStoreClient;
         private Guid? _currentAccountId;
         private CancellationToken _stoppingToken;
@@ -63,24 +66,87 @@ namespace CommandClient
             }
         }
 
-        private Task WithdrawAmountAsync()
+        private async Task WithdrawAmountAsync()
+        {
+            var amount = Console.ReadLine();
+
+            decimal decimalAmount;
+
+            if (!decimal.TryParse(amount, out decimalAmount))
+            {
+                return;
+            }
+
+            var amountWithdrawn = new AmountWithdrawn()
+            {
+                AggregateId = _currentAccountId.Value.ToString(),
+                Amount = decimalAmount,
+            };
+
+            await _eventStoreClient.AppendToStreamAsync(
+                "Account-" + _currentAccountId.Value.ToString(),
+                StreamState.StreamExists,
+                new[] { new EventData(
+                    Uuid.NewUuid(),
+                    amountWithdrawn.GetType().Name,
+                    JsonSerializer.SerializeToUtf8Bytes(amountWithdrawn))
+                },
+                cancellationToken: _stoppingToken);
+            _currentAccountId = null;
+        }
+
+        private async Task TransferAmountAsync()
         {
             throw new NotImplementedException();
         }
 
-        private Task TransferAmountAsync()
+        private async Task DepositAmountAsync()
         {
-            throw new NotImplementedException();
+            var amount = Console.ReadLine();
+
+            decimal decimalAmount;
+
+            if (!decimal.TryParse(amount, out decimalAmount))
+            {
+                return;
+            }
+
+            var amountDeposited = new AmountDeposited()
+            {
+                AggregateId = _currentAccountId.Value.ToString(),
+                Amount = decimalAmount,
+            };
+
+            await _eventStoreClient.AppendToStreamAsync(
+                "Account-" + _currentAccountId.Value.ToString(),
+                StreamState.StreamExists,
+                new[] { new EventData(
+                    Uuid.NewUuid(),
+                    amountDeposited.GetType().Name,
+                    JsonSerializer.SerializeToUtf8Bytes(amountDeposited))
+                },
+                cancellationToken: _stoppingToken);
+            _currentAccountId = null;
         }
 
-        private Task DepositAmountAsync()
+        private async Task DeleteAccountAsync()
         {
-            throw new NotImplementedException();
-        }
+            var accountDeleted = new AccountDeleted()
+            {
+                AggregateId = _currentAccountId.Value.ToString(),
 
-        private Task DeleteAccountAsync()
-        {
-            throw new NotImplementedException();
+            };
+
+            await _eventStoreClient.AppendToStreamAsync(
+                "Account-" + _currentAccountId.Value.ToString(),
+                StreamState.StreamExists,
+                new[] { new EventData(
+                    Uuid.NewUuid(),
+                    accountDeleted.GetType().Name,
+                    JsonSerializer.SerializeToUtf8Bytes(accountDeleted))
+                },
+                cancellationToken: _stoppingToken);
+            _currentAccountId = null;
         }
 
         private async Task CreateAccountAsync()
@@ -90,30 +156,21 @@ namespace CommandClient
 
             _currentAccountId = Guid.NewGuid();
 
-            AccountCreated evt = new AccountCreated()
+            var accountCreated = new AccountCreated()
             {
                 AggregateId = _currentAccountId.Value.ToString(),
                 OwnerName = ownerName
             };
 
-            await WriteEventAsync(evt);
-        }
-
-        private async Task WriteEventAsync(AccountCreated evt)
-        {
-
-            // TODO: Optimistic concurrency
-            // https://developers.eventstore.com/clients/grpc/appending-events/#handling-concurrency
-            var eventData = new EventData(
-                Uuid.NewUuid(),
-                evt.GetType().Name,
-                JsonSerializer.SerializeToUtf8Bytes(evt));
-
             await _eventStoreClient.AppendToStreamAsync(
-            "Account-" + _currentAccountId.Value.ToString(),
-            StreamState.Any,
-            new[] { eventData },
-            cancellationToken: _stoppingToken);
+                "Account-" + _currentAccountId.Value.ToString(),
+                StreamState.NoStream,
+                new[] { new EventData(
+                    Uuid.NewUuid(),
+                    accountCreated.GetType().Name,
+                    JsonSerializer.SerializeToUtf8Bytes(accountCreated))
+                },
+                cancellationToken: _stoppingToken);
         }
 
         private void PrintMenu()

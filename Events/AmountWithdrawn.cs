@@ -1,8 +1,7 @@
 ﻿namespace Events
 {
-    public class AmountWithdrawn : IEvent
+    public class AmountWithdrawn : EventBase
     {
-        public string AggregateId { get; set; }
         public decimal Amount { get; set; }
 
     }

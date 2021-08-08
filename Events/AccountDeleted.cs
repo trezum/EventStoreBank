@@ -1,7 +1,6 @@
 ﻿namespace Events
 {
-    public class AccountDeleted : IEvent
+    public class AccountDeleted : EventBase
     {
-        public string AggregateId { get; set; }
     }
 }

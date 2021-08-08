@@ -1,8 +1,7 @@
 ﻿namespace Events
 {
-    public class AccountCreated : IEvent
+    public class AccountCreated : EventBase
     {
-        public string AggregateId { get; set; }
         public string OwnerName { get; set; }
     }
 }
