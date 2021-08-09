@@ -1,12 +1,19 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System.Threading.Tasks;
 
 namespace ReadModelUpdater
 {
     class Program
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
-        }
+        private static Task Main(string[] args) =>
+            CreateHostBuilder(args).Build().RunAsync();
+
+        static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureServices((_, services) =>
+                    services.AddHostedService<ReadModelUpdateWorker>()
+                            .AddEventStoreClient("esdb://localhost:2113?tls=false"));
+
     }
 }

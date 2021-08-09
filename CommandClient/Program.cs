@@ -1,7 +1,5 @@
-﻿using EventStore.Client;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Threading.Tasks;
 
 namespace CommandClient
@@ -14,7 +12,7 @@ namespace CommandClient
         static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((_, services) =>
-                    services.AddHostedService<Worker>()
+                    services.AddHostedService<CommandClientWorker>()
                             .AddEventStoreClient("esdb://localhost:2113?tls=false"));
 
     }

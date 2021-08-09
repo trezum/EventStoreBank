@@ -3,17 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandClient", "CommandClient\CommandClient.csproj", "{E1D8D98D-3162-44F9-9E6C-6361A80FEBDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandClient", "CommandClient\CommandClient.csproj", "{E1D8D98D-3162-44F9-9E6C-6361A80FEBDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueryClient", "QueryClient\QueryClient.csproj", "{A2A19E48-3E97-44C3-84D5-BD7C4D83C700}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryClient", "QueryClient\QueryClient.csproj", "{A2A19E48-3E97-44C3-84D5-BD7C4D83C700}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadModelUpdater", "ReadModelUpdater\ReadModelUpdater.csproj", "{9B413654-5688-4362-95EB-0EB1AB1A2842}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadModelUpdater", "ReadModelUpdater\ReadModelUpdater.csproj", "{9B413654-5688-4362-95EB-0EB1AB1A2842}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events", "Events\Events.csproj", "{4A3C430B-3292-4784-BEE9-AB46F5FFFC93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Events", "Events\Events.csproj", "{4A3C430B-3292-4784-BEE9-AB46F5FFFC93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands", "Commands\Commands.csproj", "{58EA12ED-EF74-4A3E-9E91-ACB8BAD9A29D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Commands", "Commands\Commands.csproj", "{58EA12ED-EF74-4A3E-9E91-ACB8BAD9A29D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Queries", "Queries\Queries.csproj", "{80D72B13-E296-4072-9E00-10A99296525D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Queries", "Queries\Queries.csproj", "{80D72B13-E296-4072-9E00-10A99296525D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "Model\Model.csproj", "{43513F0D-01C2-46BA-BCD5-DD060DAB33ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{80D72B13-E296-4072-9E00-10A99296525D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80D72B13-E296-4072-9E00-10A99296525D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80D72B13-E296-4072-9E00-10A99296525D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43513F0D-01C2-46BA-BCD5-DD060DAB33ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43513F0D-01C2-46BA-BCD5-DD060DAB33ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43513F0D-01C2-46BA-BCD5-DD060DAB33ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43513F0D-01C2-46BA-BCD5-DD060DAB33ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,16 +8,17 @@ using Microsoft.Extensions.Hosting;
 
 namespace CommandClient
 {
-    public class Worker : BackgroundService
+    public class CommandClientWorker : BackgroundService
     {
         // TODO: Optimistic concurrency
         // https://developers.eventstore.com/clients/grpc/appending-events/#handling-concurrency
+        // If an event has been sent it is the truth, so it should be denied here.
 
         private readonly EventStoreClient _eventStoreClient;
         private Guid? _currentAccountId;
         private CancellationToken _stoppingToken;
 
-        public Worker(EventStoreClient eventStoreClient)
+        public CommandClientWorker(EventStoreClient eventStoreClient)
         {
             _eventStoreClient = eventStoreClient;
             _currentAccountId = null;
@@ -34,6 +35,19 @@ namespace CommandClient
             }
         }
 
+        private void PrintMenu()
+        {
+            Console.WriteLine("Select a function by pressing the corresponding number: ");
+            Console.WriteLine("(0) Create Account");
+
+            if (_currentAccountId.HasValue)
+            {
+                Console.WriteLine("(1) Delete Account");
+                Console.WriteLine("(2) Deposit Amount");
+                Console.WriteLine("(3) Transfer Amount");
+                Console.WriteLine("(4) Withdraw Account");
+            }
+        }
 
         private async Task MenuSelectionAsync()
         {
@@ -92,7 +106,6 @@ namespace CommandClient
                     JsonSerializer.SerializeToUtf8Bytes(amountWithdrawn))
                 },
                 cancellationToken: _stoppingToken);
-            _currentAccountId = null;
         }
 
         private async Task TransferAmountAsync()
@@ -126,7 +139,6 @@ namespace CommandClient
                     JsonSerializer.SerializeToUtf8Bytes(amountDeposited))
                 },
                 cancellationToken: _stoppingToken);
-            _currentAccountId = null;
         }
 
         private async Task DeleteAccountAsync()
@@ -173,19 +185,6 @@ namespace CommandClient
                 cancellationToken: _stoppingToken);
         }
 
-        private void PrintMenu()
-        {
-            Console.WriteLine("Select a function by pressing the corresponding number: ");
-            Console.WriteLine("(0) Create Account");
-
-            if (_currentAccountId.HasValue)
-            {
-                Console.WriteLine("(1) Delete Account");
-                Console.WriteLine("(2) Deposit Amount");
-                Console.WriteLine("(3) Transfer Amount");
-                Console.WriteLine("(4) Withdraw Account");
-            }
-        }
 
     }
 }
