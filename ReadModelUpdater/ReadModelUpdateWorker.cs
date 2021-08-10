@@ -30,7 +30,8 @@ namespace ReadModelUpdater
             await _eventStoreClient.SubscribeToAllAsync(
                 async (subscription, evnt, cancellationToken) =>
                 {
-                    // handle using delegates?
+                    // Handle using delegates?
+                    // Could have a microservice for each if needed
                     Console.WriteLine($"Received event {evnt.OriginalEventNumber}@{evnt.OriginalStreamId}@{evnt.Event.EventType}");
                     Console.WriteLine(Encoding.UTF8.GetString(evnt.Event.Data.ToArray()));
 
