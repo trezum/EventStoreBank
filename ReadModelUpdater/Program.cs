@@ -8,7 +8,7 @@ using Commands;
 
 namespace ReadModelUpdater
 {
-    class Program
+    static class Program
     {
         private static Task Main(string[] args) =>
             CreateHostBuilder(args).Build().RunAsync();
@@ -18,10 +18,14 @@ namespace ReadModelUpdater
                 .ConfigureServices((_, services) =>
                     services.AddHostedService<ReadModelUpdateWorker>()
                             .AddDbContext<BankContext>()
-                            .AddEventStoreClient("esdb://localhost:2113?tls=false"));
-        private static void RegisterCommands(IServiceCollection services)
+                            .AddEventStoreClient("esdb://localhost:2113?tls=false")
+                            //.RegisterQueries()
+                            .RegisterCommands());
+
+
+        private static IServiceCollection RegisterCommands(this IServiceCollection services)
         {
-            Assembly? assembly = Assembly.GetAssembly(typeof(ICommand));
+            Assembly? assembly = Assembly.GetAssembly(typeof(AccountCreateCommand));
 
             if (assembly != null)
             {
@@ -33,9 +37,10 @@ namespace ReadModelUpdater
                     }
                 }
             }
+            return services;
         }
 
-        private static void RegisterQueries(IServiceCollection services)
+        private static IServiceCollection RegisterQueries(this IServiceCollection services)
         {
             Assembly? assembly = Assembly.GetAssembly(typeof(IQuery));
 
@@ -49,6 +54,7 @@ namespace ReadModelUpdater
                     }
                 }
             }
+            return services;
         }
 
     }

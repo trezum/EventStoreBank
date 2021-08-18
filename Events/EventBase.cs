@@ -9,6 +9,7 @@ namespace Events
             Timestamp = DateTime.Now;
         }
         public DateTime Timestamp { get; }
-        public string AggregateId { get; set; }
+        public Guid AggregateId { get; set; }
+        public long EventVersion { get; set; }
     }
 }

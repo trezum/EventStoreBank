@@ -32,13 +32,13 @@ namespace ReadModelUpdater
                 {
                     // Handle using delegates?
                     // Could have a microservice for each if needed
+                    // Use EventStoreDB checkpoint to know where to read from in the all-stream
                     Console.WriteLine($"Received event {evnt.OriginalEventNumber}@{evnt.OriginalStreamId}@{evnt.Event.EventType}");
                     Console.WriteLine(Encoding.UTF8.GetString(evnt.Event.Data.ToArray()));
 
                     await handleIfAccountCreated(evnt);
                     await handleIfAccountDeleted(evnt);
                     await handleIfAmountDeposited(evnt);
-                    await handleIfAmountTransfered(evnt);
                     await handleIfAmountWithdrawn(evnt);
 
                 }, filterOptions: new SubscriptionFilterOptions(EventTypeFilter.ExcludeSystemEvents())
@@ -54,16 +54,6 @@ namespace ReadModelUpdater
             {
                 var eventObject = JsonSerializer.Deserialize<AmountWithdrawn>(evnt.Event.Data.Span);
                 Console.WriteLine("Calling AmountWithdrawn command.");
-                await Task.Yield();
-            }
-        }
-
-        private async Task handleIfAmountTransfered(ResolvedEvent evnt)
-        {
-            if (evnt.Event.EventType == typeof(AmountTransferred).Name)
-            {
-                var eventObject = JsonSerializer.Deserialize<AmountTransferred>(evnt.Event.Data.Span);
-                Console.WriteLine("Calling AmountTransferred command.");
                 await Task.Yield();
             }
         }

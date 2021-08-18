@@ -15,6 +15,8 @@ namespace CommandClient
         // If an event has been sent it is the truth, so it should be denied here.
 
         private readonly EventStoreClient _eventStoreClient;
+
+        // If null no account is "selected in the client cli"
         private Guid? _currentAccountId;
         private CancellationToken _stoppingToken;
 
@@ -93,7 +95,7 @@ namespace CommandClient
 
             var amountWithdrawn = new AmountWithdrawn()
             {
-                AggregateId = _currentAccountId.Value.ToString(),
+                AggregateId = _currentAccountId.Value,
                 Amount = decimalAmount,
             };
 
@@ -110,6 +112,10 @@ namespace CommandClient
 
         private async Task TransferAmountAsync()
         {
+            // This should be done with two events using optimistic concurrency for both, a withdrawal from one account and a deposit to another.
+            // if done in one event it will only show up in one of the account streams, 
+            // maybe a deposit and a withdaw should have a source or destionation added
+
             throw new NotImplementedException();
         }
 
@@ -126,7 +132,7 @@ namespace CommandClient
 
             var amountDeposited = new AmountDeposited()
             {
-                AggregateId = _currentAccountId.Value.ToString(),
+                AggregateId = _currentAccountId.Value,
                 Amount = decimalAmount,
             };
 
@@ -145,7 +151,7 @@ namespace CommandClient
         {
             var accountDeleted = new AccountDeleted()
             {
-                AggregateId = _currentAccountId.Value.ToString(),
+                AggregateId = _currentAccountId.Value,
 
             };
 
@@ -170,7 +176,7 @@ namespace CommandClient
 
             var accountCreated = new AccountCreated()
             {
-                AggregateId = _currentAccountId.Value.ToString(),
+                AggregateId = _currentAccountId.Value,
                 OwnerName = ownerName
             };
 
