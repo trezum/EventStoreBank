@@ -19,6 +19,7 @@ namespace ReadModelUpdater
                     services.AddHostedService<ReadModelUpdateWorker>()
                             .AddDbContext<BankContext>()
                             .AddEventStoreClient("esdb://localhost:2113?tls=false")
+                            .AddScoped(typeof(EventHandelers))
                             //.RegisterQueries()
                             .RegisterCommands());
 

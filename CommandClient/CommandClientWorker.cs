@@ -16,7 +16,7 @@ namespace CommandClient
 
         private readonly EventStoreClient _eventStoreClient;
 
-        // If null no account is "selected in the client cli"
+        // If null no account is selected in the client cli.
         private Guid? _currentAccountId;
         private CancellationToken _stoppingToken;
 
@@ -84,6 +84,7 @@ namespace CommandClient
 
         private async Task WithdrawAmountAsync()
         {
+            Console.WriteLine("Enter amount to withdraw:");
             var amount = Console.ReadLine();
 
             decimal decimalAmount;
@@ -96,6 +97,7 @@ namespace CommandClient
             var amountWithdrawn = new AmountWithdrawn()
             {
                 AggregateId = _currentAccountId.Value,
+                Destination = null,
                 Amount = decimalAmount,
             };
 
@@ -108,6 +110,7 @@ namespace CommandClient
                     JsonSerializer.SerializeToUtf8Bytes(amountWithdrawn))
                 },
                 cancellationToken: _stoppingToken);
+            Console.WriteLine("Amount withdrawn.");
         }
 
         private async Task TransferAmountAsync()
@@ -116,11 +119,14 @@ namespace CommandClient
             // if done in one event it will only show up in one of the account streams, 
             // maybe a deposit and a withdaw should have a source or destionation added
 
+            //When sending the two events it should be done as an transaction, maybe opposite event should be created for rollback if two cant be transacted.
+
             throw new NotImplementedException();
         }
 
         private async Task DepositAmountAsync()
         {
+            Console.WriteLine("Enter amount to deposit:");
             var amount = Console.ReadLine();
 
             decimal decimalAmount;
@@ -145,6 +151,7 @@ namespace CommandClient
                     JsonSerializer.SerializeToUtf8Bytes(amountDeposited))
                 },
                 cancellationToken: _stoppingToken);
+            Console.WriteLine("Amount deposited.");
         }
 
         private async Task DeleteAccountAsync()
@@ -164,6 +171,7 @@ namespace CommandClient
                     JsonSerializer.SerializeToUtf8Bytes(accountDeleted))
                 },
                 cancellationToken: _stoppingToken);
+            Console.WriteLine("Account deleted.");
             _currentAccountId = null;
         }
 
@@ -189,6 +197,7 @@ namespace CommandClient
                     JsonSerializer.SerializeToUtf8Bytes(accountCreated))
                 },
                 cancellationToken: _stoppingToken);
+            Console.WriteLine("Account created.");
         }
 
 

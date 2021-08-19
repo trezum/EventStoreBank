@@ -17,10 +17,12 @@ namespace ReadModelUpdater
 
         private readonly EventStoreClient _eventStoreClient;
         private CancellationToken _stoppingToken;
+        private readonly EventHandelers _eventHandelers;
 
-        public ReadModelUpdateWorker(EventStoreClient eventStoreClient)
+        public ReadModelUpdateWorker(EventStoreClient eventStoreClient, EventHandelers eventHandelers)
         {
             _eventStoreClient = eventStoreClient;
+            _eventHandelers = eventHandelers;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -33,59 +35,22 @@ namespace ReadModelUpdater
                     // Handle using delegates?
                     // Could have a microservice for each if needed
                     // Use EventStoreDB checkpoint to know where to read from in the all-stream
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("-----------------------------------------------------------------------------------------");
+                    Console.ForegroundColor = ConsoleColor.Gray;
                     Console.WriteLine($"Received event {evnt.OriginalEventNumber}@{evnt.OriginalStreamId}@{evnt.Event.EventType}");
                     Console.WriteLine(Encoding.UTF8.GetString(evnt.Event.Data.ToArray()));
 
-                    await handleIfAccountCreated(evnt);
-                    await handleIfAccountDeleted(evnt);
-                    await handleIfAmountDeposited(evnt);
-                    await handleIfAmountWithdrawn(evnt);
+                    await _eventHandelers.handleIfAccountCreated(evnt);
+                    await _eventHandelers.handleIfAccountDeleted(evnt);
+                    await _eventHandelers.handleIfAmountDeposited(evnt);
+                    await _eventHandelers.handleIfAmountWithdrawn(evnt);
 
                 }, filterOptions: new SubscriptionFilterOptions(EventTypeFilter.ExcludeSystemEvents())
                 );
 
             Console.WriteLine("Waiting for any key:");
             Console.ReadKey();
-        }
-
-        private async Task handleIfAmountWithdrawn(ResolvedEvent evnt)
-        {
-            if (evnt.Event.EventType == typeof(AmountWithdrawn).Name)
-            {
-                var eventObject = JsonSerializer.Deserialize<AmountWithdrawn>(evnt.Event.Data.Span);
-                Console.WriteLine("Calling AmountWithdrawn command.");
-                await Task.Yield();
-            }
-        }
-
-        private async Task handleIfAmountDeposited(ResolvedEvent evnt)
-        {
-            if (evnt.Event.EventType == typeof(AmountDeposited).Name)
-            {
-                var eventObject = JsonSerializer.Deserialize<AmountDeposited>(evnt.Event.Data.Span);
-                Console.WriteLine("Calling AmountDeposited command.");
-                await Task.Yield();
-            }
-        }
-
-        private async Task handleIfAccountDeleted(ResolvedEvent evnt)
-        {
-            if (evnt.Event.EventType == typeof(AccountDeleted).Name)
-            {
-                var eventObject = JsonSerializer.Deserialize<AccountDeleted>(evnt.Event.Data.Span);
-                Console.WriteLine("Calling AccountDeleted command.");
-                await Task.Yield();
-            }
-        }
-
-        private async Task handleIfAccountCreated(ResolvedEvent evnt)
-        {
-            if (evnt.Event.EventType == typeof(AccountCreated).Name)
-            {
-                var eventObject = JsonSerializer.Deserialize<AccountCreated>(evnt.Event.Data.Span);
-                Console.WriteLine("Calling AccountCreated command.");
-                await Task.Yield();
-            }
         }
     }
 }
