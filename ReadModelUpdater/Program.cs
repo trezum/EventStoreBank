@@ -21,7 +21,8 @@ namespace ReadModelUpdater
                             .AddEventStoreClient("esdb://localhost:2113?tls=false")
                             .AddScoped(typeof(EventHandelers))
                             //.RegisterQueries()
-                            .RegisterCommands());
+                            .RegisterCommands()
+                );
 
 
         private static IServiceCollection RegisterCommands(this IServiceCollection services)

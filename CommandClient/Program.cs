@@ -13,7 +13,9 @@ namespace CommandClient
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((_, services) =>
                     services.AddHostedService<CommandClientWorker>()
-                            .AddEventStoreClient("esdb://localhost:2113?tls=false"));
+                            .AddEventStoreClient("esdb://localhost:2113?tls=false")
+                            .AddSingleton(typeof(EventSender))
+                );
 
     }
 }

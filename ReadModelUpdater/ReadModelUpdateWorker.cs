@@ -29,12 +29,12 @@ namespace ReadModelUpdater
         {
             _stoppingToken = stoppingToken;
 
+            //TODO: Use EventStoreDB checkpoint to know where to read from in the all-stream
             await _eventStoreClient.SubscribeToAllAsync(
                 async (subscription, evnt, cancellationToken) =>
                 {
                     // Handle using delegates?
                     // Could have a microservice for each if needed
-                    // Use EventStoreDB checkpoint to know where to read from in the all-stream
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("-----------------------------------------------------------------------------------------");
                     Console.ForegroundColor = ConsoleColor.Gray;
