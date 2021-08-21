@@ -10,7 +10,7 @@ using Model;
 namespace Model.Migrations
 {
     [DbContext(typeof(BankContext))]
-    [Migration("20210819173413_InitialCreate")]
+    [Migration("20210821213428_Initial-Create")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

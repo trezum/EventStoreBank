@@ -3,7 +3,6 @@ using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using Model;
 using System.Reflection;
-using Queries;
 using Commands;
 
 namespace ReadModelUpdater
@@ -20,7 +19,6 @@ namespace ReadModelUpdater
                             .AddDbContext<BankContext>()
                             .AddEventStoreClient("esdb://localhost:2113?tls=false")
                             .AddScoped(typeof(EventHandelers))
-                            //.RegisterQueries()
                             .RegisterCommands()
                 );
 
@@ -41,24 +39,5 @@ namespace ReadModelUpdater
             }
             return services;
         }
-
-        private static IServiceCollection RegisterQueries(this IServiceCollection services)
-        {
-            Assembly? assembly = Assembly.GetAssembly(typeof(IQuery));
-
-            if (assembly != null)
-            {
-                foreach (var type in assembly.GetTypes())
-                {
-                    if (type.FullName != null && type.FullName.EndsWith("Query"))
-                    {
-                        services.AddScoped(type);
-                    }
-                }
-            }
-            return services;
-        }
-
     }
-
 }

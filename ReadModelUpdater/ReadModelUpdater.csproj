@@ -21,7 +21,6 @@
     <ProjectReference Include="..\Commands\Commands.csproj" />
     <ProjectReference Include="..\Events\Events.csproj" />
     <ProjectReference Include="..\Model\Model.csproj" />
-    <ProjectReference Include="..\Queries\Queries.csproj" />
   </ItemGroup>
 
 </Project>
