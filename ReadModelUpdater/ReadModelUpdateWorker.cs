@@ -1,9 +1,7 @@
-﻿using Events;
-using EventStore.Client;
+﻿using EventStore.Client;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 

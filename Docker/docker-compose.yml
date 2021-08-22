@@ -22,8 +22,11 @@ services:
       - type: volume
         source: eventstore-volume-logs
         target: /var/log/eventstore
-  db:
+  mssql:
     image: "mcr.microsoft.com/mssql/server:2019-CU12-ubuntu-20.04"
+    user: root
+    volumes:
+      - mssql-data:/var/opt/mssql/data
     environment:
         SA_PASSWORD: "yourStrong(!)Password"
         ACCEPT_EULA: "Y"
@@ -33,3 +36,4 @@ services:
 volumes:
   eventstore-volume-data:
   eventstore-volume-logs:
+  mssql-data:

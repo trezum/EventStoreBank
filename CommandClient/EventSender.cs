@@ -41,6 +41,11 @@ namespace CommandClient
                 });
         }
 
+        internal void DeselectAccount()
+        {
+            _currentAccountId = null;
+        }
+
         // Transactions across multiple streams are not supported.
         // https://developers.eventstore.com/clients/dotnet/20.10/appending/#transactions
         internal async Task TransferAmountAsync(Guid destinationAccount)
@@ -52,9 +57,6 @@ namespace CommandClient
 
             //When sending the two events it should be done as an transaction, maybe opposite event should be created for rollback if two cant be transacted.
 
-            // Todo: Include event version in read in order to reduce eventual concistency issues
-            // https://youtu.be/FKFu78ZEIi8?t=1771
-            // When querying for updated data the desired all eventVersion, from the write, could be sent to/with the query so it can wait for data to be updated.
             throw new NotImplementedException();
         }
 
@@ -83,15 +85,25 @@ namespace CommandClient
                 });
         }
 
-        internal Task SelectAccountAsync(Guid newSelection)
+        internal async Task SelectAccountAsync(Guid newSelection)
         {
             _currentAccountId = newSelection;
+            _eventVersion = await GetLastVersionForCurrentAccount();
+        }
 
-            //TODO: On concurrency error drop selected account and EventVersion.
+        internal async Task<long> GetLastVersionForCurrentAccount()
+        {
+            var events = _eventStoreClient.ReadStreamAsync(
+                Direction.Backwards,
+                _accountStreamPrefix + _currentAccountId.Value.ToString(),
+                StreamPosition.End,
+                1);
 
-
-            //Request event version
-            throw new NotImplementedException();
+            await foreach (var e in events)
+            {
+                return e.OriginalEventNumber.ToInt64();
+            }
+            throw new Exception("Event Version not found!");
         }
 
         internal async Task DeleteAccountAsync()

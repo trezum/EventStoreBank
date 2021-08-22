@@ -8,14 +8,11 @@ namespace CommandClient
 {
     public class ClientWorker : BackgroundService
     {
-        // TODO: Optimistic concurrency
-        // https://developers.eventstore.com/clients/grpc/appending-events/#handling-concurrency
-        // If an event has been sent it is the truth, so it should be denied here.
-
         private CancellationToken _stoppingToken;
         private readonly EventSender _eventSender;
         private readonly TopTenAccountsQuery _topTenAccountsQuery;
 
+        // TODO: Figure out if a refactor is needed so the client works with commands and validators instead of events.
         public ClientWorker(EventSender eventSender, TopTenAccountsQuery topTenAccountsQuery)
         {
             _eventSender = eventSender;
@@ -27,9 +24,21 @@ namespace CommandClient
             _stoppingToken = stoppingToken;
             while (!_stoppingToken.IsCancellationRequested)
             {
-                Console.Clear();
-                PrintMenu();
-                await MenuSelectionAsync();
+                try
+                {
+                    PrintMenu();
+                    await MenuSelectionAsync();
+                    Console.Clear();
+                }
+                catch (Exception e)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(e.GetType());
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine("An error occured, someone else probably edited the same account, try again.");
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    _eventSender.DeselectAccount();
+                }
             }
         }
 
@@ -40,12 +49,12 @@ namespace CommandClient
             Console.WriteLine("(1) Select Account");
             if (_eventSender.HasAccountSelected())
             {
-
                 Console.WriteLine("(2) Deposit Amount");
                 Console.WriteLine("(3) Transfer Amount");
                 Console.WriteLine("(4) Withdraw Account");
                 Console.WriteLine("(5) Delete Account");
-                //Console.WriteLine("(6) Account History");
+                //Console.WriteLine("(6) Account History"); // EventDTO? Maybe just the JSON?
+                //Console.WriteLine("(7) Enable/Disable EF Core Logging");
             }
         }
 
@@ -110,11 +119,11 @@ namespace CommandClient
             Console.WriteLine("Select an account by pressing the corrorsponding number.");
             for (int i = 0; i < accounts.Length; i++)
             {
-                Console.WriteLine("({0}) - {1} - {2} - {3} - {4}", i, accounts[i].Id.ToString(), accounts[i].OwnerName, accounts[i].Balance, accounts[i].EventVersion);
+                Console.WriteLine("({0}) - {1} - {2} - {3} - {4}", i, accounts[i].Id.ToString(), accounts[i].OwnerName, accounts[i].EventVersion, accounts[i].Balance);
             }
 
             // Get selection from user
-            return accounts[GetIntFromUser()].Id;
+            return accounts[GetDigitFromUser(0, accounts.Length - 1)].Id;
         }
 
         private static decimal GetDecimalFromUser()
@@ -129,18 +138,23 @@ namespace CommandClient
                 Console.WriteLine("Enter a decimal number between {0} and {1} ", decimal.MinValue, decimal.MaxValue);
             }
         }
-        private static int GetIntFromUser(int min = int.MinValue, int max = int.MaxValue)
+
+        private static int GetDigitFromUser(int min = 0, int max = 9)
         {
             while (true)
             {
+                var key = Console.ReadKey();
+                var charr = char.GetNumericValue(key.KeyChar).ToString();
+
                 int input;
-                if (int.TryParse(Console.ReadLine(), out input) && input > min && input < max)
+                if (int.TryParse(charr, out input) && input >= min && input <= max)
                 {
                     return input;
                 }
                 Console.WriteLine("Enter a number between {0} and {1}", min, max);
             }
         }
+
 
     }
 }
