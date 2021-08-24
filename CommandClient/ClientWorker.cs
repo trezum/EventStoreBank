@@ -9,11 +9,11 @@ namespace CommandClient
     public class ClientWorker : BackgroundService
     {
         private CancellationToken _stoppingToken;
-        private readonly EventSender _eventSender;
+        private readonly EventFacade _eventSender;
         private readonly TopTenAccountsQuery _topTenAccountsQuery;
 
         // TODO: Figure out if a refactor is needed so the client works with commands and validators instead of events.
-        public ClientWorker(EventSender eventSender, TopTenAccountsQuery topTenAccountsQuery)
+        public ClientWorker(EventFacade eventSender, TopTenAccountsQuery topTenAccountsQuery)
         {
             _eventSender = eventSender;
             _topTenAccountsQuery = topTenAccountsQuery;
@@ -80,7 +80,6 @@ namespace CommandClient
             }
             else if (_eventSender.HasAccountSelected())
             {
-
                 if (selection.KeyChar == '2')
                 {
                     Console.WriteLine("Enter amount to deposit:");
@@ -154,7 +153,5 @@ namespace CommandClient
                 Console.WriteLine("Enter a number between {0} and {1}", min, max);
             }
         }
-
-
     }
 }

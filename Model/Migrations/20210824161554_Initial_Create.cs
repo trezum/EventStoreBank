@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Model.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Initial_Create : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -20,12 +20,33 @@ namespace Model.Migrations
                 {
                     table.PrimaryKey("PK_Accounts", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Checkpoints",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    CommitPosition = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    PreparePosition = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Checkpoints", x => x.Id);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Checkpoints",
+                columns: new[] { "Id", "CommitPosition", "PreparePosition" },
+                values: new object[] { 1, 0m, 0m });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "Accounts");
+
+            migrationBuilder.DropTable(
+                name: "Checkpoints");
         }
     }
 }

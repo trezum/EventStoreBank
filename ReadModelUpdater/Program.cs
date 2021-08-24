@@ -7,25 +7,23 @@ using Commands;
 
 namespace ReadModelUpdater
 {
-    static class Program
+    public static class Program
     {
         private static Task Main(string[] args) =>
             CreateHostBuilder(args).Build().RunAsync();
 
-        static IHostBuilder CreateHostBuilder(string[] args) =>
+        private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((_, services) =>
                     services.AddHostedService<ReadModelUpdateWorker>()
                             .AddDbContext<BankContext>()
                             .AddEventStoreClient("esdb://localhost:2113?tls=false")
-                            .AddScoped(typeof(EventHandelers))
+                            .AddScoped(typeof(EventHandlers))
                             .RegisterCommands()
                 );
-
-
         private static IServiceCollection RegisterCommands(this IServiceCollection services)
         {
-            Assembly? assembly = Assembly.GetAssembly(typeof(AccountCreateCommand));
+            Assembly assembly = Assembly.GetAssembly(typeof(AccountCreateCommand));
 
             if (assembly != null)
             {

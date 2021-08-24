@@ -7,24 +7,24 @@ using System.Threading.Tasks;
 
 namespace CommandClient
 {
-    static class Program
+    public static class Program
     {
-        static Task Main(string[] args) =>
+        public static Task Main(string[] args) =>
             CreateHostBuilder(args).Build().RunAsync();
 
-        static IHostBuilder CreateHostBuilder(string[] args) =>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((_, services) =>
                     services.AddHostedService<ClientWorker>()
                             .AddDbContext<BankContext>()
                             .AddEventStoreClient("esdb://localhost:2113?tls=false")
-                            .AddSingleton(typeof(EventSender))
+                            .AddSingleton(typeof(EventFacade))
                             .RegisterQueries()
                 );
 
         private static IServiceCollection RegisterQueries(this IServiceCollection services)
         {
-            Assembly? assembly = Assembly.GetAssembly(typeof(TopTenAccountsQuery));
+            Assembly assembly = Assembly.GetAssembly(typeof(TopTenAccountsQuery));
 
             if (assembly != null)
             {

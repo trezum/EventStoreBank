@@ -1,19 +1,14 @@
 ﻿using Events;
 using Model;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Commands
 {
-    public class AccountCreateCommand
+    public class AccountCreateCommand : CommandBase<AccountCreatedEvent>
     {
-        private readonly BankContext _context;
-
-        public AccountCreateCommand(BankContext context)
-        {
-            _context = context;
-        }
-
-        public async Task ExecuteAsync(AccountCreated accountCreatedEvent)
+        public AccountCreateCommand(BankContext context) : base(context) { }
+        public override async Task DBChanges(AccountCreatedEvent accountCreatedEvent, CancellationToken cancellationToken)
         {
             await _context.Accounts.AddAsync(new Account()
             {
@@ -21,9 +16,7 @@ namespace Commands
                 EventVersion = accountCreatedEvent.EventVersion,
                 Id = accountCreatedEvent.AggregateId,
                 OwnerName = accountCreatedEvent.OwnerName
-
-            });
-            await _context.SaveChangesAsync();
+            }, cancellationToken);
         }
     }
 }

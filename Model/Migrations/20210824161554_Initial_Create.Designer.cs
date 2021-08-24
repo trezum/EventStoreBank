@@ -10,8 +10,8 @@ using Model;
 namespace Model.Migrations
 {
     [DbContext(typeof(BankContext))]
-    [Migration("20210821213428_Initial-Create")]
-    partial class InitialCreate
+    [Migration("20210824161554_Initial_Create")]
+    partial class Initial_Create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,6 +39,30 @@ namespace Model.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Accounts");
+                });
+
+            modelBuilder.Entity("Model.Checkpoint", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CommitPosition")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<decimal>("PreparePosition")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Checkpoints");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CommitPosition = 0m,
+                            PreparePosition = 0m
+                        });
                 });
 #pragma warning restore 612, 618
         }

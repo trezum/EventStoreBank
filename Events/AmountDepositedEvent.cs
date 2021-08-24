@@ -2,7 +2,7 @@
 
 namespace Events
 {
-    public class AmountDeposited : EventBase
+    public class AmountDepositedEvent : EventBase
     {
         public decimal Amount { get; set; }
         // If this property is null the source is cash otherwise it is from some other account.

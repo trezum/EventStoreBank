@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CommandClient
 {
-    public class EventSender
+    public class EventFacade
     {
         // If null no account is selected.
         private Guid? _currentAccountId;
@@ -14,7 +14,7 @@ namespace CommandClient
         private readonly EventStoreClient _eventStoreClient;
         private const string _accountStreamPrefix = "Account-";
 
-        public EventSender(EventStoreClient eventStoreClient)
+        public EventFacade(EventStoreClient eventStoreClient)
         {
             _currentAccountId = null;
             _eventStoreClient = eventStoreClient;
@@ -23,7 +23,7 @@ namespace CommandClient
         internal async Task WithdrawAmountAsync(decimal decimalAmount)
         {
             _eventVersion++;
-            var amountWithdrawn = new AmountWithdrawn()
+            var amountWithdrawn = new AmountWithdrawnEvent()
             {
                 AggregateId = _currentAccountId.Value,
                 Destination = null,
@@ -68,7 +68,7 @@ namespace CommandClient
         internal async Task DepositAmountAsync(decimal decimalAmount)
         {
             _eventVersion++;
-            var amountDeposited = new AmountDeposited()
+            var amountDeposited = new AmountDepositedEvent()
             {
                 AggregateId = _currentAccountId.Value,
                 Amount = decimalAmount,
@@ -109,7 +109,7 @@ namespace CommandClient
         internal async Task DeleteAccountAsync()
         {
             _eventVersion++;
-            var accountDeleted = new AccountDeleted()
+            var accountDeleted = new AccountDeletedEvent()
             {
                 AggregateId = _currentAccountId.Value,
                 EventVersion = _eventVersion,
@@ -130,7 +130,7 @@ namespace CommandClient
         {
             _currentAccountId = Guid.NewGuid();
             _eventVersion = 0;
-            var accountCreated = new AccountCreated()
+            var accountCreated = new AccountCreatedEvent()
             {
                 AggregateId = _currentAccountId.Value,
                 OwnerName = ownerName,

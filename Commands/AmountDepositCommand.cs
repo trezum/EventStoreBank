@@ -1,24 +1,18 @@
 ﻿using Events;
 using Model;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Commands
 {
-    public class AmountDepositCommand
+    public class AmountDepositCommand : CommandBase<AmountDepositedEvent>
     {
-        private readonly BankContext _context;
-
-        public AmountDepositCommand(BankContext context)
+        public AmountDepositCommand(BankContext context) : base(context) { }
+        public override async Task DBChanges(AmountDepositedEvent model, CancellationToken cancellationToken)
         {
-            _context = context;
-        }
-
-        public async Task ExecuteAsync(AmountDeposited amountDepositedEvent)
-        {
-            var account = await _context.Accounts.FindAsync(amountDepositedEvent.AggregateId);
-            account.Balance += amountDepositedEvent.Amount;
-            account.EventVersion = amountDepositedEvent.EventVersion;
-            await _context.SaveChangesAsync();
+            var account = await _context.Accounts.FindAsync(new object[] { model.AggregateId }, cancellationToken: cancellationToken);
+            account.Balance += model.Amount;
+            account.EventVersion = model.EventVersion;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Events
 {
-    public class AccountCreated : EventBase
+    public class AccountCreatedEvent : EventBase
     {
         public string OwnerName { get; set; }
     }

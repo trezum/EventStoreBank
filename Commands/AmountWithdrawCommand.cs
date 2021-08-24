@@ -1,24 +1,19 @@
 ﻿using Events;
 using Model;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Commands
 {
-    public class AmountWithdrawCommand
+    public class AmountWithdrawCommand : CommandBase<AmountWithdrawnEvent>
     {
-        private readonly BankContext _context;
+        public AmountWithdrawCommand(BankContext context) : base(context) { }
 
-        public AmountWithdrawCommand(BankContext context)
+        public override async Task DBChanges(AmountWithdrawnEvent model, CancellationToken cancellationToken)
         {
-            _context = context;
-        }
-
-        public async Task ExecuteAsync(AmountWithdrawn amountWithdrawnEvent)
-        {
-            var account = await _context.Accounts.FindAsync(amountWithdrawnEvent.AggregateId);
-            account.Balance -= amountWithdrawnEvent.Amount;
-            account.EventVersion = amountWithdrawnEvent.EventVersion;
-            await _context.SaveChangesAsync();
+            var account = await _context.Accounts.FindAsync(new object[] { model.AggregateId }, cancellationToken: cancellationToken);
+            account.Balance -= model.Amount;
+            account.EventVersion = model.EventVersion;
         }
     }
 }

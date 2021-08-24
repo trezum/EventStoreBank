@@ -1,23 +1,17 @@
 ﻿using Events;
 using Model;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Commands
 {
-    public class AccountDeleteCommand
+    public class AccountDeleteCommand : CommandBase<AccountDeletedEvent>
     {
-        private readonly BankContext _context;
-
-        public AccountDeleteCommand(BankContext context)
+        public AccountDeleteCommand(BankContext context) : base(context) { }
+        public override async Task DBChanges(AccountDeletedEvent model, CancellationToken cancellationToken)
         {
-            _context = context;
-        }
-
-        public async Task ExecuteAsync(AccountDeleted accountDeletedEvent)
-        {
-            var account = await _context.Accounts.FindAsync(accountDeletedEvent.AggregateId);
+            var account = await _context.Accounts.FindAsync(new object[] { model.AggregateId }, cancellationToken: cancellationToken);
             _context.Remove(account);
-            await _context.SaveChangesAsync();
         }
     }
 }

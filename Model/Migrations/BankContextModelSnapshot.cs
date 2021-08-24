@@ -38,6 +38,30 @@ namespace Model.Migrations
 
                     b.ToTable("Accounts");
                 });
+
+            modelBuilder.Entity("Model.Checkpoint", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CommitPosition")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<decimal>("PreparePosition")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Checkpoints");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CommitPosition = 0m,
+                            PreparePosition = 0m
+                        });
+                });
 #pragma warning restore 612, 618
         }
     }
