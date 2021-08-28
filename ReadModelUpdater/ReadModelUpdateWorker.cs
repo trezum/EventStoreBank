@@ -28,6 +28,7 @@ namespace ReadModelUpdater
         {
             // Info on cancellationtokens
             // https://docs.microsoft.com/en-us/dotnet/standard/threading/cancellation-in-managed-threads
+            // TODO: For web api: https://stackoverflow.com/questions/64205147/addscoped-dependency-with-a-cancellationtoke
             _cancellationToken = cancellationToken;
 
             // Creating or loading checkpoing as needed.

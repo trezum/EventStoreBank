@@ -24,7 +24,7 @@ namespace CommandClient
 
         private static IServiceCollection RegisterQueries(this IServiceCollection services)
         {
-            Assembly assembly = Assembly.GetAssembly(typeof(TopTenAccountsQuery));
+            Assembly assembly = Assembly.GetAssembly(typeof(FirstTenAccountsQuery));
 
             if (assembly != null)
             {

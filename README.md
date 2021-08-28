@@ -21,11 +21,13 @@ This diagram shows the current state of the project:
 * Implement a wait function to reduce eventual concistensy problems as [suggestet by Greg Young](https://youtu.be/FKFu78ZEIi8?t=1771).
 * Clean up redundant code forinstance in the EventHandlers class.
 * Implement Transactions to other accounts.
-* Implement showing account history by displaying events from EventStoreDB.
-* Look into supplying CancelationTokens with di.
+* Look into supplying CancelationTokens with DI.
 * Clean up DI to use it more often, close to every time an object is created.
+* Use DTOs instead of db models for data transfer. :)
+* Unit tests.
 
 This diagram shows a possible future state of the project:
+
 ![EventStoreBank](/Diagrams/EventStoreBankWithAPI.svg)
 
 ## How to run

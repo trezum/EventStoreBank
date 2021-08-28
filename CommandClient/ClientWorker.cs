@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Queries;
 
 namespace CommandClient
@@ -10,10 +12,10 @@ namespace CommandClient
     {
         private CancellationToken _stoppingToken;
         private readonly EventFacade _eventSender;
-        private readonly TopTenAccountsQuery _topTenAccountsQuery;
+        private readonly FirstTenAccountsQuery _topTenAccountsQuery;
 
         // TODO: Figure out if a refactor is needed so the client works with commands and validators instead of events.
-        public ClientWorker(EventFacade eventSender, TopTenAccountsQuery topTenAccountsQuery)
+        public ClientWorker(EventFacade eventSender, FirstTenAccountsQuery topTenAccountsQuery)
         {
             _eventSender = eventSender;
             _topTenAccountsQuery = topTenAccountsQuery;
@@ -53,8 +55,7 @@ namespace CommandClient
                 Console.WriteLine("(3) Transfer Amount");
                 Console.WriteLine("(4) Withdraw Account");
                 Console.WriteLine("(5) Delete Account");
-                //Console.WriteLine("(6) Account History"); // EventDTO? Maybe just the JSON?
-                //Console.WriteLine("(7) Enable/Disable EF Core Logging");
+                Console.WriteLine("(6) Account History");
             }
         }
 
@@ -101,6 +102,15 @@ namespace CommandClient
                 {
                     await _eventSender.DeleteAccountAsync();
                     Console.WriteLine("Account deleted.");
+                }
+                else if (selection.KeyChar == '6')
+                {
+                    await foreach (var json in _eventSender.GetEventJsonFor())
+                    {
+                        Console.WriteLine(JToken.Parse(json).ToString(Formatting.Indented));
+                    }
+                    Console.WriteLine("Press any key to continue.");
+                    Console.ReadKey();
                 }
                 else
                 {

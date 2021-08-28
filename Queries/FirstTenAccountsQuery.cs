@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace Queries
 {
-    public class TopTenAccountsQuery
+    public class FirstTenAccountsQuery
     {
         private readonly BankContext _context;
 
-        public TopTenAccountsQuery(BankContext context)
+        public FirstTenAccountsQuery(BankContext context)
         {
             _context = context;
         }
