@@ -1,7 +1,6 @@
 ﻿using Commands;
 using Events;
 using EventStore.Client;
-using Model;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -12,24 +11,34 @@ namespace ReadModelUpdater
 {
     public class EventHandlers
     {
-        private readonly BankContext _bankContext;
-
         private readonly Dictionary<Type, ICommandInterface> _eventCommandMap;
 
-        public EventHandlers(BankContext bankContext)
+        public EventHandlers(
+            AccountCreateCommand accountCreateCommand,
+            AmountWithdrawCommand amountWithdrawCommand,
+            AmountDepositCommand amountDepositCommand,
+            AccountDeleteCommand accountDeleteCommand
+            )
         {
-            _bankContext = bankContext;
             _eventCommandMap = new Dictionary<Type, ICommandInterface>()
             {
-                { typeof(AccountCreatedEvent), new AccountCreateCommand(_bankContext) },
-                { typeof(AmountWithdrawnEvent), new AmountWithdrawCommand(_bankContext) },
-                { typeof(AmountDepositedEvent), new AmountDepositCommand(_bankContext) },
-                { typeof(AccountDeletedEvent), new AccountDeleteCommand(_bankContext) },
-
+                { typeof(AccountCreatedEvent), accountCreateCommand },
+                { typeof(AmountWithdrawnEvent), amountWithdrawCommand },
+                { typeof(AmountDepositedEvent), amountDepositCommand},
+                { typeof(AccountDeletedEvent), accountDeleteCommand },
             };
         }
 
-        public async Task handleGenericEvent<T>(ResolvedEvent evnt, CancellationToken cancellationToken)
+
+        public async Task handleEvents(ResolvedEvent evnt, CancellationToken cancellationToken)
+        {
+            await handleGenericEvent<AccountCreatedEvent>(evnt, cancellationToken);
+            await handleGenericEvent<AccountDeletedEvent>(evnt, cancellationToken);
+            await handleGenericEvent<AmountDepositedEvent>(evnt, cancellationToken);
+            await handleGenericEvent<AmountWithdrawnEvent>(evnt, cancellationToken);
+        }
+
+        private async Task handleGenericEvent<T>(ResolvedEvent evnt, CancellationToken cancellationToken)
         {
             if (evnt.Event.EventType == typeof(T).Name)
             {

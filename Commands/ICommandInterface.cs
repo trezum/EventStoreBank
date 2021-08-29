@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace Commands
+﻿namespace Commands
 {
     public interface ICommandInterface
     {

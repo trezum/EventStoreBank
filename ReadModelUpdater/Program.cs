@@ -5,6 +5,7 @@ using Model;
 using System.Reflection;
 using Commands;
 using Events;
+using Queries;
 
 namespace ReadModelUpdater
 {
@@ -21,6 +22,7 @@ namespace ReadModelUpdater
                             .AddEventStoreClient("esdb://localhost:2113?tls=false")
                             .AddScoped(typeof(EventHandlers))
                             .RegisterCommands()
+                            .RegisterQueries()
                 );
         private static IServiceCollection RegisterCommands(this IServiceCollection services)
         {
@@ -32,7 +34,24 @@ namespace ReadModelUpdater
                 {
                     if (type.FullName != null && type.FullName.EndsWith("Command"))
                     {
-                        services.AddScoped(type);
+                        services.AddTransient(type);
+                    }
+                }
+            }
+            return services;
+        }
+
+        private static IServiceCollection RegisterQueries(this IServiceCollection services)
+        {
+            Assembly assembly = Assembly.GetAssembly(typeof(FirstTenAccountsQuery));
+
+            if (assembly != null)
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (type.FullName != null && type.FullName.EndsWith("Query"))
+                    {
+                        services.AddTransient(type);
                     }
                 }
             }
