@@ -9,7 +9,7 @@ namespace Commands
     // a commit- and prepare position when handeling an event
     // and to keep that update and the update of the database in the same transaction
     // https://docs.microsoft.com/en-us/ef/core/saving/transactions
-    public abstract class CommandBase<T>
+    public abstract class CommandBase<T> : ICommandInterface
     {
         protected readonly BankContext _context;
 
@@ -22,7 +22,7 @@ namespace Commands
         public abstract Task DBChanges(T model, CancellationToken cancellationToken);
         public async Task ExecuteAsync(T model, ulong commitPosition, ulong preparePosition, CancellationToken cancellationToken)
         {
-            var checkpoint =  await _context.Checkpoints.FirstOrDefaultAsync(c => c.Id == 1, cancellationToken);
+            var checkpoint = await _context.Checkpoints.FirstOrDefaultAsync(c => c.Id == 1, cancellationToken);
             await DBChanges(model, cancellationToken);
             checkpoint.CommitPosition = commitPosition;
             checkpoint.PreparePosition = preparePosition;

@@ -1,4 +1,5 @@
 ﻿using Commands;
+using Events;
 using EventStore.Client;
 using Microsoft.Extensions.Hosting;
 using Model;
@@ -70,10 +71,14 @@ namespace ReadModelUpdater
                     // If an event has been sent it is the truth, so it should be denied here.
                     // Could not have a microservice for each because the events should be processed in the correct order.
                     // TODO: Make a generic method for this.
-                    await _eventHandelers.handleIfAccountCreated(evnt, cancellationToken);
-                    await _eventHandelers.handleIfAccountDeleted(evnt, cancellationToken);
-                    await _eventHandelers.handleIfAmountDeposited(evnt, cancellationToken);
-                    await _eventHandelers.handleIfAmountWithdrawn(evnt, cancellationToken);
+                    await _eventHandelers.handleGenericEvent<AccountCreatedEvent>(evnt, cancellationToken);
+                    await _eventHandelers.handleGenericEvent<AccountDeletedEvent>(evnt, cancellationToken);
+                    await _eventHandelers.handleGenericEvent<AmountDepositedEvent>(evnt, cancellationToken);
+                    await _eventHandelers.handleGenericEvent<AmountWithdrawnEvent>(evnt, cancellationToken);
+                    //await _eventHandelers.handleIfAccountCreated(evnt, cancellationToken);
+                    //await _eventHandelers.handleIfAccountDeleted(evnt, cancellationToken);
+                    //await _eventHandelers.handleIfAmountDeposited(evnt, cancellationToken);
+                    //await _eventHandelers.handleIfAmountWithdrawn(evnt, cancellationToken);
                 }, filterOptions: new SubscriptionFilterOptions(EventTypeFilter.ExcludeSystemEvents()), cancellationToken: _cancellationToken
                 );
 

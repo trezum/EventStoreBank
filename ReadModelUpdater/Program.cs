@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Model;
 using System.Reflection;
 using Commands;
+using Events;
 
 namespace ReadModelUpdater
 {
