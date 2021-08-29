@@ -15,6 +15,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Queries", "Queries\Queries.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Model", "Model\Model.csproj", "{43513F0D-01C2-46BA-BCD5-DD060DAB33ED}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{B5B173E4-9068-49DC-A3D5-7EC4438877B5}"
+	ProjectSection(SolutionItems) = preProject
+		Docker\docker-compose.yml = Docker\docker-compose.yml
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -23,6 +23,19 @@ namespace CommandClient
             _eventStoreClient = eventStoreClient;
         }
 
+
+        internal async Task AppendToStream<T>(T evt)
+        {
+            await _eventStoreClient.AppendToStreamAsync(
+                _accountStreamPrefix + _currentAccountId.Value.ToString(),
+                StreamRevision.FromInt64(_eventVersion - 1),
+                new[] { new EventData(
+                    Uuid.NewUuid(),
+                    evt.GetType().Name,
+                    JsonSerializer.SerializeToUtf8Bytes(evt))
+                });
+        }
+
         internal async Task WithdrawAmountAsync(decimal decimalAmount)
         {
             _eventVersion++;
@@ -34,14 +47,7 @@ namespace CommandClient
                 EventVersion = _eventVersion,
             };
 
-            await _eventStoreClient.AppendToStreamAsync(
-                _accountStreamPrefix + _currentAccountId.Value.ToString(),
-                StreamRevision.FromInt64(_eventVersion - 1),
-                new[] { new EventData(
-                    Uuid.NewUuid(),
-                    amountWithdrawn.GetType().Name,
-                    JsonSerializer.SerializeToUtf8Bytes(amountWithdrawn))
-                });
+            await AppendToStream(amountWithdrawn);
         }
 
         internal void DeselectAccount()
@@ -81,14 +87,7 @@ namespace CommandClient
                 EventVersion = _eventVersion,
             };
 
-            await _eventStoreClient.AppendToStreamAsync(
-                _accountStreamPrefix + _currentAccountId.Value.ToString(),
-                StreamRevision.FromInt64(_eventVersion - 1),
-                new[] { new EventData(
-                    Uuid.NewUuid(),
-                    amountDeposited.GetType().Name,
-                    JsonSerializer.SerializeToUtf8Bytes(amountDeposited))
-                });
+            await AppendToStream(amountDeposited);
         }
 
         internal async Task SelectAccountAsync(Guid newSelection)
@@ -121,14 +120,7 @@ namespace CommandClient
                 EventVersion = _eventVersion,
             };
 
-            await _eventStoreClient.AppendToStreamAsync(
-                    _accountStreamPrefix + _currentAccountId.Value.ToString(),
-                    StreamRevision.FromInt64(_eventVersion - 1),
-                    new[] { new EventData(
-                    Uuid.NewUuid(),
-                    accountDeleted.GetType().Name,
-                    JsonSerializer.SerializeToUtf8Bytes(accountDeleted))
-                    });
+            await AppendToStream(accountDeleted);
             _currentAccountId = null;
         }
 
@@ -163,14 +155,7 @@ namespace CommandClient
                 EventVersion = _eventVersion,
             };
 
-            await _eventStoreClient.AppendToStreamAsync(
-                _accountStreamPrefix + _currentAccountId.Value.ToString(),
-                StreamState.NoStream,
-                new[] { new EventData(
-                    Uuid.NewUuid(),
-                    accountCreated.GetType().Name,
-                    JsonSerializer.SerializeToUtf8Bytes(accountCreated))
-                });
+            await AppendToStream(accountCreated);
         }
     }
 }

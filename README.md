@@ -19,10 +19,8 @@ This diagram shows the current state of the project:
 * Commands in the current system are really SQL commands and not system commands ( compare the two diagrams).
 * Implement an API so the client does not have to know how to send events (see the diagram below).
 * Implement a wait function to reduce eventual concistensy problems as [suggestet by Greg Young](https://youtu.be/FKFu78ZEIi8?t=1771).
-* Clean up redundant code forinstance in the EventHandlers class.
 * Implement Transactions to other accounts.
 * Look into supplying CancelationTokens with DI.
-* Clean up DI to use it more often, close to every time an object is created.
 * Use DTOs instead of db models for data transfer. :)
 * Unit tests.
 
