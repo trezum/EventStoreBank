@@ -28,9 +28,6 @@ namespace Model.Migrations
                     b.Property<decimal>("Balance")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<long>("EventVersion")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("OwnerName")
                         .HasColumnType("nvarchar(max)");
 

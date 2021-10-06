@@ -18,6 +18,8 @@ This diagram shows the current state of the project:
 
 * Commands in the current system are really SQL commands and not system commands ( compare the two diagrams).
 * Implement an API so the client does not have to know how to send events (see the diagram below).
+* Implement a react frontend
+* Implement a blazor frontend look into [mudBlazor](https://mudblazor.com/) and [havit](https://havit.blazor.eu/)
 * Implement a wait function to reduce eventual concistensy problems as [suggestet by Greg Young](https://youtu.be/FKFu78ZEIi8?t=1771).
 * Implement Transactions to other accounts.
 * Look into supplying CancelationTokens with DI.

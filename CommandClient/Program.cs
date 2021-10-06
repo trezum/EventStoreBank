@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using EvtFacade;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Model;
 using Queries;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace CommandClient
+namespace Client
 {
     public static class Program
     {

@@ -6,29 +6,24 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace CommandClient
+namespace EvtFacade
 {
     public class EventFacade
     {
-        // If null no account is selected.
-        // TODO: Should be moved to the frontend if an api is introduced.
-        private Guid? _currentAccountId;
-        private long _eventVersion;
+
         private readonly EventStoreClient _eventStoreClient;
         private const string _accountStreamPrefix = "Account-";
 
         public EventFacade(EventStoreClient eventStoreClient)
         {
-            _currentAccountId = null;
             _eventStoreClient = eventStoreClient;
         }
 
-
-        internal async Task AppendToStream<T>(T evt)
+        private async Task AppendToStream<T>(Guid accountId, long expectedStreamRevision, T evt)
         {
             await _eventStoreClient.AppendToStreamAsync(
-                _accountStreamPrefix + _currentAccountId.Value.ToString(),
-                StreamRevision.FromInt64(_eventVersion - 1),
+                _accountStreamPrefix + accountId.ToString(),
+                StreamRevision.FromInt64(expectedStreamRevision),
                 new[] { new EventData(
                     Uuid.NewUuid(),
                     evt.GetType().Name,
@@ -36,71 +31,56 @@ namespace CommandClient
                 });
         }
 
-        internal async Task WithdrawAmountAsync(decimal decimalAmount)
+        public async Task WithdrawAmountAsync(Guid accountId, long expectedStreamRevision, decimal decimalAmount)
         {
-            _eventVersion++;
             var amountWithdrawn = new AmountWithdrawnEvent()
             {
-                AggregateId = _currentAccountId.Value,
+                AggregateId = accountId,
                 Destination = null,
-                Amount = decimalAmount,
-                EventVersion = _eventVersion,
+                Amount = decimalAmount
             };
 
-            await AppendToStream(amountWithdrawn);
+            await AppendToStream(accountId, expectedStreamRevision, amountWithdrawn);
         }
 
-        internal void DeselectAccount()
-        {
-            _currentAccountId = null;
-        }
 
         // Transactions across multiple streams are not supported.
         // https://developers.eventstore.com/clients/dotnet/20.10/appending/#transactions
         // This thread has some surggestions:
         // https://discuss.eventstore.com/t/cross-aggregate-transactions-in-event-store/2357
-        internal async Task TransferAmountAsync(Guid destinationAccount)
+        public async Task TransferAmountAsync(Guid sourceAccountId, Guid destinationAccount, decimal amount)
         {
-            _eventVersion++;
             // implement using process manager?
             // This should be done with two events using optimistic concurrency for both, a withdrawal from one account and a deposit to another.
             // if done in one event it will only show up in one of the account streams, 
             // maybe a deposit and a withdaw should have a source or destionation added
+            // --->maybe one event is fine, the state could be updated for two accounts.
 
             //When sending the two events it should be done as an transaction, maybe opposite event should be created for rollback if two cant be transacted.
-
+            await Task.CompletedTask;
             throw new NotImplementedException();
         }
 
-        internal bool HasAccountSelected()
-        {
-            return _currentAccountId != null;
-        }
 
-        internal async Task DepositAmountAsync(decimal decimalAmount)
+
+        public async Task DepositAmountAsync(Guid accountId, long expectedStreamRevision, decimal decimalAmount)
         {
-            _eventVersion++;
             var amountDeposited = new AmountDepositedEvent()
             {
-                AggregateId = _currentAccountId.Value,
+                AggregateId = accountId,
                 Amount = decimalAmount,
-                EventVersion = _eventVersion,
             };
 
-            await AppendToStream(amountDeposited);
+            await AppendToStream(accountId, expectedStreamRevision, amountDeposited);
         }
 
-        internal async Task SelectAccountAsync(Guid newSelection)
-        {
-            _currentAccountId = newSelection;
-            _eventVersion = await GetLastVersionForCurrentAccount();
-        }
 
-        internal async Task<long> GetLastVersionForCurrentAccount()
+
+        public async Task<long> GetLastVersionForAccount(Guid accountId)
         {
             var events = _eventStoreClient.ReadStreamAsync(
                 Direction.Backwards,
-                _accountStreamPrefix + _currentAccountId.Value.ToString(),
+                _accountStreamPrefix + accountId.ToString(),
                 StreamPosition.End,
                 1);
 
@@ -111,24 +91,20 @@ namespace CommandClient
             throw new Exception("Event Version not found!");
         }
 
-        internal async Task DeleteAccountAsync()
+        public async Task DeleteAccountAsync(Guid accountId, long expectedStreamRevision)
         {
-            _eventVersion++;
             var accountDeleted = new AccountDeletedEvent()
             {
-                AggregateId = _currentAccountId.Value,
-                EventVersion = _eventVersion,
+                AggregateId = accountId,
             };
 
-            await AppendToStream(accountDeleted);
-            _currentAccountId = null;
+            await AppendToStream(accountId, expectedStreamRevision, accountDeleted);
         }
 
-        internal async IAsyncEnumerable<string> GetEventJsonFor()
+        public async IAsyncEnumerable<string> GetEventJsonForAccount(Guid accountId)
         {
             var events = _eventStoreClient.ReadStreamAsync(
-                Direction.Forwards,
-                _accountStreamPrefix + _currentAccountId.Value.ToString(),
+                Direction.Forwards, _accountStreamPrefix + accountId.ToString(),
                 StreamPosition.Start);
 
             // TOOD: add cancelation tokens here:
@@ -144,18 +120,15 @@ namespace CommandClient
             }
         }
 
-        internal async Task CreateAccountAsync(string ownerName)
+        public async Task CreateAccountAsync(Guid accountId, string ownerName)
         {
-            _currentAccountId = Guid.NewGuid();
-            _eventVersion = 0;
             var accountCreated = new AccountCreatedEvent()
             {
-                AggregateId = _currentAccountId.Value,
+                AggregateId = accountId,
                 OwnerName = ownerName,
-                EventVersion = _eventVersion,
             };
 
-            await AppendToStream(accountCreated);
+            await AppendToStream(accountId, -1, accountCreated);
         }
     }
 }

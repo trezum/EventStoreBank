@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{B5B173E4-9
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventFacade", "EventFacade\EventFacade.csproj", "{CEEBDDA2-623C-49BC-9DB8-5B392DB5DD1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{43513F0D-01C2-46BA-BCD5-DD060DAB33ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43513F0D-01C2-46BA-BCD5-DD060DAB33ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43513F0D-01C2-46BA-BCD5-DD060DAB33ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEEBDDA2-623C-49BC-9DB8-5B392DB5DD1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEEBDDA2-623C-49BC-9DB8-5B392DB5DD1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEEBDDA2-623C-49BC-9DB8-5B392DB5DD1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEEBDDA2-623C-49BC-9DB8-5B392DB5DD1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Model;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Queries
@@ -14,9 +15,9 @@ namespace Queries
             _context = context;
         }
 
-        public async Task<Account[]> Execute()
+        public async Task<Account[]> Execute(CancellationToken cancellationToken)
         {
-            return await _context.Accounts.Take(10).ToArrayAsync();
+            return await _context.Accounts.Take(10).ToArrayAsync(cancellationToken: cancellationToken);
         }
     }
 }

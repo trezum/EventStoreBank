@@ -10,8 +10,8 @@ using Model;
 namespace Model.Migrations
 {
     [DbContext(typeof(BankContext))]
-    [Migration("20210824161554_Initial_Create")]
-    partial class Initial_Create
+    [Migration("20211006164439_initial_create")]
+    partial class initial_create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -29,9 +29,6 @@ namespace Model.Migrations
 
                     b.Property<decimal>("Balance")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<long>("EventVersion")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("OwnerName")
                         .HasColumnType("nvarchar(max)");

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EvtFacade;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -6,19 +7,39 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Queries;
 
-namespace CommandClient
+namespace Client
 {
     public class ClientWorker : BackgroundService
     {
         private CancellationToken _stoppingToken;
-        private readonly EventFacade _eventSender;
+        private readonly EventFacade _eventFacade;
         private readonly FirstTenAccountsQuery _topTenAccountsQuery;
+        private Guid? _currentAccountId;
+        private long _expectedStreamRevision;
 
         // TODO: Figure out if a refactor is needed so the client works with commands and validators instead of events.
-        public ClientWorker(EventFacade eventSender, FirstTenAccountsQuery topTenAccountsQuery)
+        public ClientWorker(EventFacade eventFacade, FirstTenAccountsQuery topTenAccountsQuery)
         {
-            _eventSender = eventSender;
+            // If null no account is selected.
+            _currentAccountId = null;
+            _expectedStreamRevision = 0;
+            _eventFacade = eventFacade;
             _topTenAccountsQuery = topTenAccountsQuery;
+        }
+
+        public void DeselectAccount()
+        {
+            _currentAccountId = null;
+        }
+        public bool HasAccountSelected()
+        {
+            return _currentAccountId != null;
+        }
+
+        public async Task SelectAccountAsync(Guid newSelection)
+        {
+            _currentAccountId = newSelection;
+            _expectedStreamRevision = await _eventFacade.GetLastVersionForAccount(_currentAccountId.Value);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -39,17 +60,16 @@ namespace CommandClient
                     Console.WriteLine(e.Message);
                     Console.WriteLine("An error occured, someone else probably edited the same account, try again.");
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    _eventSender.DeselectAccount();
+                    DeselectAccount();
                 }
             }
         }
-
         private void PrintMenu()
         {
             Console.WriteLine("Select a function by pressing the corresponding number: ");
             Console.WriteLine("(0) Create Account");
             Console.WriteLine("(1) Select Account");
-            if (_eventSender.HasAccountSelected())
+            if (HasAccountSelected())
             {
                 Console.WriteLine("(2) Deposit Amount");
                 Console.WriteLine("(3) Transfer Amount");
@@ -68,44 +88,50 @@ namespace CommandClient
             {
                 Console.WriteLine("Enter owner name:");
                 var ownerName = Console.ReadLine();
-
-                await _eventSender.CreateAccountAsync(ownerName);
-
+                _currentAccountId = Guid.NewGuid();
+                await _eventFacade.CreateAccountAsync(_currentAccountId.Value, ownerName);
+                _expectedStreamRevision = 0;
                 Console.WriteLine("Account created.");
             }
             else if (selection.KeyChar == '1')
             {
                 Guid account = await GetAccountSelectionFromUser();
-                await _eventSender.SelectAccountAsync(account);
+                await SelectAccountAsync(account);
                 Console.WriteLine("Account selected.");
             }
-            else if (_eventSender.HasAccountSelected())
+            else if (HasAccountSelected())
             {
                 if (selection.KeyChar == '2')
                 {
                     Console.WriteLine("Enter amount to deposit:");
-                    await _eventSender.DepositAmountAsync(GetDecimalFromUser());
+                    await _eventFacade.DepositAmountAsync(_currentAccountId.Value, _expectedStreamRevision, GetDecimalFromUser());
+                    _expectedStreamRevision++;
                     Console.WriteLine("Amount deposited.");
                 }
                 else if (selection.KeyChar == '3')
                 {
-                    var destinationAccount = Guid.NewGuid();
-                    await _eventSender.TransferAmountAsync(destinationAccount);
+                    throw new NotImplementedException();
+
+                    //await _eventSender.TransferAmountAsync(_currentAccountId.Value, destinationAccount, );
+                    //_expectedStreamRevision++;
                 }
                 else if (selection.KeyChar == '4')
                 {
                     Console.WriteLine("Enter amount to withdraw:");
-                    await _eventSender.WithdrawAmountAsync(GetDecimalFromUser());
+                    await _eventFacade.WithdrawAmountAsync(_currentAccountId.Value, _expectedStreamRevision, GetDecimalFromUser());
+                    _expectedStreamRevision++;
                     Console.WriteLine("Amount withdrawn.");
                 }
                 else if (selection.KeyChar == '5')
                 {
-                    await _eventSender.DeleteAccountAsync();
+                    await _eventFacade.DeleteAccountAsync(_currentAccountId.Value, _expectedStreamRevision);
+                    _expectedStreamRevision++;
+                    DeselectAccount();
                     Console.WriteLine("Account deleted.");
                 }
                 else if (selection.KeyChar == '6')
                 {
-                    await foreach (var json in _eventSender.GetEventJsonFor())
+                    await foreach (var json in _eventFacade.GetEventJsonForAccount(_currentAccountId.Value))
                     {
                         Console.WriteLine(JToken.Parse(json).ToString(Formatting.Indented));
                     }
@@ -123,12 +149,12 @@ namespace CommandClient
         private async Task<Guid> GetAccountSelectionFromUser()
         {
             // Query top 10 accounts
-            var accounts = await _topTenAccountsQuery.Execute();
+            var accounts = await _topTenAccountsQuery.Execute(_stoppingToken);
             // Display account table
             Console.WriteLine("Select an account by pressing the corrorsponding number.");
             for (int i = 0; i < accounts.Length; i++)
             {
-                Console.WriteLine("({0}) - {1} - {2} - {3} - {4}", i, accounts[i].Id.ToString(), accounts[i].OwnerName, accounts[i].EventVersion, accounts[i].Balance);
+                Console.WriteLine("({0}) - {1} - {2} - {3}", i, accounts[i].Id.ToString(), accounts[i].OwnerName, accounts[i].Balance);
             }
 
             // Get selection from user

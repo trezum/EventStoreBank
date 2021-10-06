@@ -13,7 +13,6 @@ namespace Commands
             await _context.Accounts.AddAsync(new Account()
             {
                 Balance = 0,
-                EventVersion = accountCreatedEvent.EventVersion,
                 Id = accountCreatedEvent.AggregateId,
                 OwnerName = accountCreatedEvent.OwnerName
             }, cancellationToken);
