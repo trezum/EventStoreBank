@@ -1,4 +1,4 @@
-﻿using EvtFacade;
+﻿using EventFacade;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,13 +12,13 @@ namespace Client
     public class ClientWorker : BackgroundService
     {
         private CancellationToken _stoppingToken;
-        private readonly EventFacade _eventFacade;
+        private readonly AccountEventFacade _eventFacade;
         private readonly FirstTenAccountsQuery _topTenAccountsQuery;
         private Guid? _currentAccountId;
         private long _expectedStreamRevision;
 
         // TODO: Figure out if a refactor is needed so the client works with commands and validators instead of events.
-        public ClientWorker(EventFacade eventFacade, FirstTenAccountsQuery topTenAccountsQuery)
+        public ClientWorker(AccountEventFacade eventFacade, FirstTenAccountsQuery topTenAccountsQuery)
         {
             // If null no account is selected.
             _currentAccountId = null;

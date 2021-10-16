@@ -6,15 +6,14 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace EvtFacade
+namespace EventFacade
 {
-    public class EventFacade
+    public class AccountEventFacade
     {
-
         private readonly EventStoreClient _eventStoreClient;
         private const string _accountStreamPrefix = "Account-";
 
-        public EventFacade(EventStoreClient eventStoreClient)
+        public AccountEventFacade(EventStoreClient eventStoreClient)
         {
             _eventStoreClient = eventStoreClient;
         }
@@ -39,10 +38,8 @@ namespace EvtFacade
                 Destination = null,
                 Amount = decimalAmount
             };
-
             await AppendToStream(accountId, expectedStreamRevision, amountWithdrawn);
         }
-
 
         // Transactions across multiple streams are not supported.
         // https://developers.eventstore.com/clients/dotnet/20.10/appending/#transactions
@@ -61,8 +58,6 @@ namespace EvtFacade
             throw new NotImplementedException();
         }
 
-
-
         public async Task DepositAmountAsync(Guid accountId, long expectedStreamRevision, decimal decimalAmount)
         {
             var amountDeposited = new AmountDepositedEvent()
@@ -70,12 +65,8 @@ namespace EvtFacade
                 AggregateId = accountId,
                 Amount = decimalAmount,
             };
-
             await AppendToStream(accountId, expectedStreamRevision, amountDeposited);
         }
-
-
-
         public async Task<long> GetLastVersionForAccount(Guid accountId)
         {
             var events = _eventStoreClient.ReadStreamAsync(
@@ -97,7 +88,6 @@ namespace EvtFacade
             {
                 AggregateId = accountId,
             };
-
             await AppendToStream(accountId, expectedStreamRevision, accountDeleted);
         }
 
@@ -128,6 +118,7 @@ namespace EvtFacade
                 OwnerName = ownerName,
             };
 
+            // -1 is used here to not have a expected stream revision
             await AppendToStream(accountId, -1, accountCreated);
         }
     }

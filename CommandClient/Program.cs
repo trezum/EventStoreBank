@@ -1,4 +1,4 @@
-﻿using EvtFacade;
+﻿using EventFacade;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Model;
@@ -19,7 +19,7 @@ namespace Client
                     services.AddHostedService<ClientWorker>()
                             .AddDbContext<BankContext>()
                             .AddEventStoreClient("esdb://localhost:2113?tls=false")
-                            .AddSingleton(typeof(EventFacade))
+                            .AddSingleton(typeof(AccountEventFacade))
                             .RegisterQueries()
                 );
 

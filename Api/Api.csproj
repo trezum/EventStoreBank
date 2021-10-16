@@ -10,4 +10,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Commands\Commands.csproj" />
+    <ProjectReference Include="..\EventFacade\EventFacade.csproj" />
+    <ProjectReference Include="..\Model\Model.csproj" />
+    <ProjectReference Include="..\Queries\Queries.csproj" />
+  </ItemGroup>
+
 </Project>

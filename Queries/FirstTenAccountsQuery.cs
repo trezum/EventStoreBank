@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Queries
 {
+    // This Query is used by the console client because it can only show ten Accounts atm.
     public class FirstTenAccountsQuery
     {
         private readonly BankContext _context;

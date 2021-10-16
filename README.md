@@ -9,26 +9,32 @@ Optimistic concurrency is included so two clients should not be able to cause tr
 
 A checkpoint for ReadModelUpdater has been implementet so it can be closed while the clients can keep working and then started again.
 
-This diagram shows the current state of the project:
+I recently read about the new minimal api in .net 6 and decided to try it out for this project.
 
-![EventStoreBank](/Diagrams/EventStoreBank.svg)
+
+
+This diagram shows a high level overview of the project:
+
+![EventStoreBank](/Diagrams/EventStoreBankWithAPI.svg)
+
 
 
 ## Known issues / Planned improvements
 
-* Commands in the current system are really SQL commands and not system commands ( compare the two diagrams).
-* Implement an API so the client does not have to know how to send events (see the diagram below).
-* Implement a react frontend
+* Commands in the current system are really SQL commands and not system commands.
+* Add validation to API, for instance check if account exists.
+* Add general errorhandeling to request pipeline.
+* Implement a react frontend.
 * Implement a blazor frontend look into [mudBlazor](https://mudblazor.com/) and [havit](https://havit.blazor.eu/)
 * Implement a wait function to reduce eventual concistensy problems as [suggestet by Greg Young](https://youtu.be/FKFu78ZEIi8?t=1771).
 * Implement Transactions to other accounts.
+* Figure out how CancelationTokens should be supplied from minimal api.
 * Look into supplying CancelationTokens with DI.
 * Use DTOs instead of db models for data transfer. :)
 * Unit tests.
+* Logging of errors and more
+* Add swagger Schemas
 
-This diagram shows a possible future state of the project:
-
-![EventStoreBank](/Diagrams/EventStoreBankWithAPI.svg)
 
 ## How to run
 
@@ -44,4 +50,4 @@ In Package Manager Console run the command **Update-Database**
 
 ### Running the code
 Start the ReadModelUpdater
-Start a few clients and start sending events.
+Start a few clients or api and start sending events.
